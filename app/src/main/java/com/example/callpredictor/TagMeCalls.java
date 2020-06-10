@@ -58,7 +58,7 @@ public class TagMeCalls extends AppCompatActivity implements AdapterView.OnItemS
             SMSRecords = extras.getStringArray("SMSRecords");
             System.out.println("Length of Call Record Array : " + callRecords.length);
             System.out.println("Length of SMS record Array : " + SMSRecords.length);
-            titleTextView.setText(R.string.CallInstructions);
+            titleTextView.setText(R.string.Call_title);
         }else{
             System.out.println("No records found!");
         }
@@ -69,7 +69,7 @@ public class TagMeCalls extends AppCompatActivity implements AdapterView.OnItemS
         //listening for spinner item selections
         relationshipSpinner.setOnItemSelectedListener(this);
         //displaying the first record on the screen
-        recordTextView.setText(callRecords[arrayPointer++]);
+        recordTextView.setText(callRecords[arrayPointer++].split(",")[0]);
         //listening for next button click
         //my weird algorithm. The runtime of this is O(scary) but works well enough in practice.
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +82,7 @@ public class TagMeCalls extends AppCompatActivity implements AdapterView.OnItemS
                     //displaying call records one by one
                     callRecordsCommaSeparated.append(callRecords[arrayPointer- 1]).append(",").append(relationshipSpinner.getSelectedItem()).append(",").append(genderRadioButton.getText()).append(",").append(ageEditText.getText());
                     ageEditText.setText("");
-                    recordTextView.setText(callRecords[arrayPointer++]);
+                    recordTextView.setText(callRecords[arrayPointer++].split(",")[0]);
                 }else{
                     //last record is reached
                     callRecordsCommaSeparated.append(callRecords[arrayPointer- 1]).append(",").append(relationshipSpinner.getSelectedItem()).append(",").append(genderRadioButton.getText()).append(",").append(ageEditText.getText());

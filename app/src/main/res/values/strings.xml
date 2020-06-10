@@ -1,13 +1,11 @@
 <resources>
     <string name="app_name">Samsung Thingy</string>
-    <string name="terms">I understand and accept </string>
-    <string name="instructions">\n\n\t\tHello, Thank you for volunteering in our project app will be collecting your call logs and SMS data\n\t\tWe
-        will require you to tag your relationship with the contacts on the next page under 8 primary categories as you deem fit. Please Enter Your Details:</string>
+    <string name="terms">We will be collecting your call and SMS records as it is stored on your device along with your tagging information consisting of your relationship with the contact, the contact\'s age and the contact\'s gender.</string>
     <string name="title_activity_display_message">DisplayMessageActivity</string>
     <string name="submit_button_text">\"abc\"</string>
     <string name="record">record</string>
-    <string name="CallInstructions">Press next to display CALL records one by one</string>
-    <string name="SMSInstructions">Press next to display CALL records one by one</string>
+    <string name="Call_title">Call Records</string>
+    <string name="SMS_title">SMS Records</string>
     <string name="ThankYou">Thank you for participating in this mad experiment blah blah blah. Please follow r/IllegallySmolCats on reddit. KTHNXBYE.</string>
     <string name="Developers">Our Kickass Team : Irene, Sumukh, Dhanya, GMK</string>
 </resources>

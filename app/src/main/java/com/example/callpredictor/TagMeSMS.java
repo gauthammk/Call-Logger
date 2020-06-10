@@ -54,7 +54,7 @@ public class TagMeSMS extends AppCompatActivity implements AdapterView.OnItemSel
         //getting the SMSRecords array
         if(extras != null) {
             SMSRecords = extras.getStringArray("SMSRecords");
-            titleTextView.setText(R.string.SMSInstructions);
+            titleTextView.setText(R.string.SMS_title);
         }else{
             System.out.println("No records found!");
         }

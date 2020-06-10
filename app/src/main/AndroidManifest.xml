@@ -12,7 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ThankYou"></activity>
+        <activity android:name=".NewTagMeSMS"></activity>
+        <activity android:name=".NewTagMeCalls" />
+        <activity android:name=".ThankYou" />
         <activity android:name=".TagMeSMS" />
         <activity android:name=".TagMeCalls" />
         <activity android:name=".MainActivity">
