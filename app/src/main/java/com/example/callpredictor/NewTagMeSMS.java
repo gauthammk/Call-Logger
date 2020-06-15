@@ -44,7 +44,7 @@ public class NewTagMeSMS extends AppCompatActivity {
         // initialising the fixed components
         titleTextView = findViewById(R.id.title);
         SMSRecordsCommaSeparated = new StringBuilder();
-        LinearLayout linearLayout = findViewById(R.id.linearLayout);
+        LinearLayout mainContent = findViewById(R.id.mainContent);
         nextButton = findViewById(R.id.next);
 
         // getting the passed data from the previous activity
@@ -124,7 +124,7 @@ public class NewTagMeSMS extends AppCompatActivity {
             recordLayout.addView(age[i]);
             recordLayout.addView(rg[i]);
             recordLayout.addView(relationshipSpinner[i]);
-            linearLayout.addView(recordLayout);
+            mainContent.addView(recordLayout);
 
             // adding a nice border around the recordLayout and relationshipSpinner
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
