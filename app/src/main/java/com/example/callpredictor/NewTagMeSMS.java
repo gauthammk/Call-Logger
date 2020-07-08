@@ -25,12 +25,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 public class NewTagMeSMS extends AppCompatActivity {
-    String[] SMSRecords;
-    String[] relationshipMap = { "None", "Friend", "Father", "Mother", "Spouse", "Child", "Sibling", "Colleague", "Other" };
+    String[] SMSRecords, freqSms;
+    String[] relationshipMap = { "Tag Here", "Friend", "Father", "Mother", "Spouse", "Child", "Sibling", "Colleague", "Other" };
     TextView titleTextView;
     Button nextButton;
+    int arrayPointer = 0;
+    int required;
+    int index;
+    String hashNum, call_data;
     StringBuilder SMSRecordsCommaSeparated;
-    int required = 5;
+    HashMap<String, String> nameHash = new HashMap<String, String>();
+    HashMap<String, String> smsHash = new HashMap<String, String>();
+    HashMap<String, Integer> idHash = new HashMap<String, Integer>();
+    int maxId;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -38,6 +45,7 @@ public class NewTagMeSMS extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_tag_me_sms);
 
+        Intent inte = getIntent();
         // initialising the fixed components
         titleTextView = findViewById(R.id.title);
         SMSRecordsCommaSeparated = new StringBuilder();
@@ -49,17 +57,27 @@ public class NewTagMeSMS extends AppCompatActivity {
         // getting the callRecords and SMSRecords array
         if(extras != null) {
             SMSRecords = extras.getStringArray("SMSRecords");
+            freqSms = extras.getStringArray("freqSms");
             titleTextView.setText(R.string.SMS_title);
+            nameHash = (HashMap<String, String>)inte.getSerializableExtra("nameHash");
+            smsHash = (HashMap<String, String>)inte.getSerializableExtra("smsHash");
+            call_data = extras.getString("call_data");
+            idHash = (HashMap<String, Integer>)inte.getSerializableExtra("idHash");
+            maxId = extras.getInt("maxId");
         }else{
-            System.out.println("No records found!");
+            titleTextView.setText("No records found!");
         }
 
         // initialising user data components as arrays
-        final Spinner[] relationshipSpinner = new Spinner[SMSRecords.length];
-        final CheckBox[] hider = new CheckBox[SMSRecords.length];
+        required = freqSms.length <= 15 ? freqSms.length : 15;
+        //final RadioButton[][] rb = new RadioButton[freqSms.length][2];
+        //RadioGroup[] rg = new RadioGroup[freqSms.length];
+        final Spinner[] relationshipSpinner = new Spinner[freqSms.length];
+        //final EditText[] age = new EditText[freqSms.length];
+        final CheckBox[] hider = new CheckBox[freqSms.length];
 
         // looping through the records and creating corresponding user data components
-        for (int i = 0; i < SMSRecords.length; i++) {
+        for (int i = 0; i < freqSms.length; i++) {
 
             // setting the layout to contain all the components in each record's display
             LinearLayout recordLayout = new LinearLayout(this);
@@ -71,15 +89,38 @@ public class NewTagMeSMS extends AppCompatActivity {
             // setting the hidden property
             hider[i] = new CheckBox(this);
             hider[i].setText("Hide");
+            hider[i].setChecked(false);
 
             // setting the contact name
             TextView tv = new TextView(this);
             // not too sure about how to display this part
-            tv.setText(SMSRecords[i].split(",")[3]);
+
+            tv.setText(nameHash.get(freqSms[i]));
             tv.setTextColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null));
             tv.setTextSize(25);
             tv.setLayoutParams(layoutParams);
             tv.setPadding(20,20,20,20);
+
+            /*// setting the radio buttons
+            rg[i] = new RadioGroup(this);
+            rg[i].setOrientation(RadioGroup.HORIZONTAL);
+            rb[i][0] = new RadioButton(this);
+            rb[i][0].setText("Male");
+            rb[i][1] = new RadioButton(this);
+            rb[i][1].setText("Female");
+            //rb[i][1].setChecked(true);
+            rg[i].addView(rb[i][0]);
+            rg[i].addView(rb[i][1]);
+            rg[i].setLayoutParams(layoutParams);
+            rg[i].setPadding(20,20,20,20);
+
+            // setting the age option
+            age[i] = new EditText(this);
+            age[i].setLayoutParams(layoutParams);
+            age[i].setHint("AGE");
+            age[i].setInputType(InputType.TYPE_CLASS_NUMBER);
+            age[i].setFilters(new InputFilter[] { new InputFilter. LengthFilter(2) });
+            age[i].setPadding(20,20,20,20);*/
 
             // setting the relationship spinner
             relationshipSpinner[i] = new Spinner(this);
@@ -95,6 +136,8 @@ public class NewTagMeSMS extends AppCompatActivity {
             // adding the user data components to the recordLayout
             recordLayout.addView(hider[i]);
             recordLayout.addView(tv);
+            //recordLayout.addView(age[i]);
+            //recordLayout.addView(rg[i]);
             recordLayout.addView(relationshipSpinner[i]);
             mainContent.addView(recordLayout);
 
@@ -112,50 +155,90 @@ public class NewTagMeSMS extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
-                // Check if the minimum number of records are tagged
+
                 int taggedContacts = 0;
-                for (int i = 0; i < SMSRecords.length; i++) {
-                    if (relationshipSpinner[i].getSelectedItem() != "None") {
+                for (int i = 0; i < freqSms.length; i++) {
+                    if (relationshipSpinner[i].getSelectedItem() != "Tag Here") {
                         taggedContacts++;
                     }
                 }
-
                 if (taggedContacts >= required) {
                     // Adding the csv headers
-                    SMSRecordsCommaSeparated.append("ID, code, idk_what_this_is, Message, Date_Time, idk_what_this_is_again, Relationship");
+                    SMSRecordsCommaSeparated.append("ID, Name, Relationship, Message, Date_Time, Type\n");
                     // building the string to convert to csv
-                    for (int i = 0; i < SMSRecords.length; i++) {
+                    for (int i = 0; i < freqSms.length; i++) {
                         boolean shouldBeHidden = hider[i].isChecked();
-                        if (shouldBeHidden) {
-                            System.out.print(SMSRecords[i].split(",")[0] + ": hidden");
-                        }
-                        SMSRecordsCommaSeparated.append(SMSRecords[i] + "," + relationshipSpinner[i].getSelectedItem());
+                        String s = "";
+                        if (shouldBeHidden == false)
+                            s += nameHash.get(freqSms[i]) + ", " + relationshipSpinner[i].getSelectedItem();
+                        else
+                            s += "#####" + ", " + relationshipSpinner[i].getSelectedItem();
+                    /*if (rb[i][0].isChecked()) {
+                        s += ", Male, " + relationshipSpinner[i].getSelectedItem() + ", " + age[i].getText();
+                    } else if (rb[i][1].isChecked()){
+                        s += ", Female, " + relationshipSpinner[i].getSelectedItem() + ", " + age[i].getText();
+                    }
+                    else{
+                        s += ", , " + relationshipSpinner[i].getSelectedItem() + ", " + age[i].getText();
+                    }*/
+                        smsHash.replace(freqSms[i], s);
+                    }
+                    while (arrayPointer < SMSRecords.length) {
+                        //System.out.println("Array Pointer = "+arrayPointer);
+                        //index = callRecords[arrayPointer].indexOf(",")+1;
+                        //index = SMSRecords[arrayPointer].indexOf(",") + 1;
+                        index = 0;
+                        hashNum = SMSRecords[arrayPointer].substring(index, index + 8);
+                        SMSRecordsCommaSeparated.append(idHash.get(hashNum)).append(", ").append(smsHash.get(hashNum)).append(",").append(SMSRecords[arrayPointer].substring(9));
+                        arrayPointer++;
                     }
                     // printing out the csv string to the console
-                    System.out.println(SMSRecordsCommaSeparated.toString());
+                    System.out.println("---------------------------------Sms Data Csv --------------------------------\n" + SMSRecordsCommaSeparated.toString());
                     // moving to the SMS screen
-                    Intent intent = new Intent(NewTagMeSMS.this, ThankYou.class);
-                    intent.putExtra("SMSRecords", SMSRecords);
-                    startActivity(intent);
+                    Intent tintent = new Intent(NewTagMeSMS.this, ThankYou.class);
+                    tintent.putExtra("SMSRecords", SMSRecords);
+                    startActivity(tintent);
 
                     // writing tagged call records to the csv file
-                    try (FileOutputStream out = openFileOutput("SMS_data.csv", Context.MODE_PRIVATE)) {
-                        // saving the file onto the device
-                        out.write((SMSRecordsCommaSeparated.toString()).getBytes());
-                        // exporting the saved csv file
+                    String smscsv = "SMS_data.csv";
+                    String callcsv = "Call_data.csv";
+                    try{
+                        FileOutputStream callout = openFileOutput(callcsv, Context.MODE_PRIVATE);
+                        FileOutputStream smsout = openFileOutput(smscsv, Context.MODE_PRIVATE);
+                        //saving the file into device
+                        callout.write(call_data.getBytes());
+                        smsout.write((SMSRecordsCommaSeparated.toString()).getBytes());
+                        //exporting the saved csv file
                         Context context = getApplicationContext();
-                        File filelocation = new File(getFilesDir(), "SMS_data.csv");
-                        Uri path = FileProvider.getUriForFile(context, "com.example.callpredictor.fileprovider", filelocation);
-                        Intent fileIntent = new Intent(Intent.ACTION_SEND);
-                        fileIntent.setType("text/csv");
-                        fileIntent.putExtra(Intent.EXTRA_SUBJECT, "SMS Data");
-                        fileIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        fileIntent.putExtra(Intent.EXTRA_STREAM, path);
-                        startActivity(Intent.createChooser(fileIntent, "Send File"));
+
+                        File callfilelocation = new File(getFilesDir(), callcsv);
+                        File smsfilelocation = new File(getFilesDir(), smscsv);
+                        Uri callpath = FileProvider.getUriForFile(context, "com.example.dataapp.fileprovider", callfilelocation);
+                        Uri smspath = FileProvider.getUriForFile(context, "com.example.dataapp.fileprovider", smsfilelocation);
+                        System.out.println("---------------------------" + callpath + "------------------------");
+                        System.out.println("---------------------------" + smspath + "------------------------");
+                        String email = "bms.datacollection@gmail.com";
+                        String subject = "Call Data and Sms Data";
+                        String message = "Call Data Records and SMS Data Records";
+                        final Intent emailIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                        emailIntent.setType("text/csv");
+                        emailIntent.setType("vnd.android.cursor.dir/email");
+                        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{email});
+                        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
+                        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, message);
+                        emailIntent.setPackage("com.google.android.gm");
+                        if (callpath != null && smspath != null) {
+                            ArrayList<Uri> uris = new ArrayList<Uri>();
+                            uris.add(callpath);
+                            uris.add(smspath);
+                            emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+                        }
+                        startActivity(Intent.createChooser(emailIntent, "Sending email..."));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } else {
+                }
+                else {
                     Toast toast = Toast.makeText(getApplicationContext(),
                             "Please tag at least " + required + " contacts",
                             Toast.LENGTH_SHORT);
