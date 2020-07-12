@@ -23,6 +23,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.HashMap;
 
 public class NewTagMeCalls extends AppCompatActivity {
     String[] callRecords, SMSRecords, freqContacts;
@@ -32,7 +33,7 @@ public class NewTagMeCalls extends AppCompatActivity {
     int index;
     int required;
     int arrayPointer = 0;
-    String hashNum, Name;
+    String hashNum, UserName, TimeStamp;
     StringBuilder callRecordsCommaSeparated;
     HashMap<String, String> callHash = new HashMap<String, String>();
     HashMap<String, String> nameHash = new HashMap<String, String>();
@@ -67,6 +68,8 @@ public class NewTagMeCalls extends AppCompatActivity {
             nameHash = (HashMap<String, String>)inte.getSerializableExtra("nameHash");
             idHash = (HashMap<String, Integer>)inte.getSerializableExtra("idHash");
             maxId = extras.getInt("maxId");
+            UserName = extras.getString("UserName");
+            TimeStamp = extras.getString("TimeStamp");
             //csvName = extras.getString("csvName");
             System.out.println("Length of Call Record Array : " + callRecords.length);
             System.out.println("Length of SMS record Array : " + SMSRecords.length);
@@ -250,6 +253,8 @@ public class NewTagMeCalls extends AppCompatActivity {
                     nintent.putExtra("idHash", idHash);
                     nintent.putExtra("maxId", maxId);
                     nintent.putExtra("call_data", callRecordsCommaSeparated.toString());
+                    nintent.putExtra("UserName", UserName);
+                    nintent.putExtra("TimeStamp", TimeStamp);
                     startActivity(nintent);
                     /*
                     // writing tagged call records to the csv file

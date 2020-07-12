@@ -23,6 +23,8 @@ import androidx.core.content.res.ResourcesCompat;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class NewTagMeSMS extends AppCompatActivity {
     String[] SMSRecords, freqSms;
@@ -32,7 +34,7 @@ public class NewTagMeSMS extends AppCompatActivity {
     int arrayPointer = 0;
     int required;
     int index;
-    String hashNum, call_data;
+    String hashNum, call_data, UserName, TimeStamp;
     StringBuilder SMSRecordsCommaSeparated;
     HashMap<String, String> nameHash = new HashMap<String, String>();
     HashMap<String, String> smsHash = new HashMap<String, String>();
@@ -64,6 +66,8 @@ public class NewTagMeSMS extends AppCompatActivity {
             call_data = extras.getString("call_data");
             idHash = (HashMap<String, Integer>)inte.getSerializableExtra("idHash");
             maxId = extras.getInt("maxId");
+            UserName = extras.getString("UserName");
+            TimeStamp = extras.getString("TimeStamp");
         }else{
             titleTextView.setText("No records found!");
         }
@@ -164,7 +168,7 @@ public class NewTagMeSMS extends AppCompatActivity {
                 }
                 if (taggedContacts >= required) {
                     // Adding the csv headers
-                    SMSRecordsCommaSeparated.append("ID, Name, Relationship, Message, Date_Time, Type\n");
+                    SMSRecordsCommaSeparated.append("ID, Name, Relationship, Message, Date_Time\n");
                     // building the string to convert to csv
                     for (int i = 0; i < freqSms.length; i++) {
                         boolean shouldBeHidden = hider[i].isChecked();
@@ -200,23 +204,33 @@ public class NewTagMeSMS extends AppCompatActivity {
                     startActivity(tintent);
 
                     // writing tagged call records to the csv file
+                    Context context = getApplicationContext();
+
                     String smscsv = "SMS_data.csv";
                     String callcsv = "Call_data.csv";
+                    String tactxt = "terms_and_conditions.txt";
+                    String heading = "CONSENT FORM FOR COLLECTION OF PERSONAL DATA BY INSTITUTE\n\n";
+                    String terms = heading + context.getResources().getString(R.string.terms) + "\n\nName : "+UserName+"\nTime Stamp : "+TimeStamp;
                     try{
                         FileOutputStream callout = openFileOutput(callcsv, Context.MODE_PRIVATE);
                         FileOutputStream smsout = openFileOutput(smscsv, Context.MODE_PRIVATE);
+                        FileOutputStream tacout = openFileOutput(tactxt, Context.MODE_PRIVATE);
                         //saving the file into device
                         callout.write(call_data.getBytes());
                         smsout.write((SMSRecordsCommaSeparated.toString()).getBytes());
+                        tacout.write(terms.getBytes());
+
                         //exporting the saved csv file
-                        Context context = getApplicationContext();
 
                         File callfilelocation = new File(getFilesDir(), callcsv);
                         File smsfilelocation = new File(getFilesDir(), smscsv);
+                        File tacfilelocation = new File(getFilesDir(), tactxt);
                         Uri callpath = FileProvider.getUriForFile(context, "com.example.dataapp.fileprovider", callfilelocation);
                         Uri smspath = FileProvider.getUriForFile(context, "com.example.dataapp.fileprovider", smsfilelocation);
+                        Uri tacpath = FileProvider.getUriForFile(context, "com.example.dataapp.fileprovider", tacfilelocation);
                         System.out.println("---------------------------" + callpath + "------------------------");
                         System.out.println("---------------------------" + smspath + "------------------------");
+                        System.out.println("---------------------------" + tacpath + "------------------------");
                         String email = "bms.datacollection@gmail.com";
                         String subject = "Call Data and Sms Data";
                         String message = "Call Data Records and SMS Data Records";
@@ -231,6 +245,7 @@ public class NewTagMeSMS extends AppCompatActivity {
                             ArrayList<Uri> uris = new ArrayList<Uri>();
                             uris.add(callpath);
                             uris.add(smspath);
+                            uris.add(tacpath);
                             emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
                         }
                         startActivity(Intent.createChooser(emailIntent, "Sending email..."));

@@ -22,6 +22,17 @@ import org.hashids.Hashids;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import static android.provider.CallLog.Calls.CACHED_NAME;
 import static android.provider.CallLog.Calls.DATE;
@@ -70,20 +81,38 @@ public class MainActivity extends AppCompatActivity {
         }
         // move to the next screen and pass the call and SMS record arrays
         Button start = findViewById(R.id.start);
-
+        final EditText name =  findViewById(R.id.name);
+        final CheckBox agree = findViewById(R.id.checkBox);
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("----------------------------CSV NAME --------------------");
-                Intent intent = new Intent(MainActivity.this, NewTagMeCalls.class);
-                intent.putExtra("callRecords", callRecords);
-                intent.putExtra("SMSRecords", SMSRecords);
-                intent.putExtra("freqContacts", freqContacts);
-                intent.putExtra("nameHash", nameHash);
-                intent.putExtra("idHash", idHash);
-                intent.putExtra("maxId", maxId);
-                //intent.putExtra("csvName", csvName);
-                startActivity(intent);
+                if(name.getText().toString().isEmpty()){
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            "Name required",
+                            Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else if(agree.isChecked()==false){
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            "Please agree to the terms and conditions to proceed",
+                            Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                else {
+                    Date date= new Date();
+                    Timestamp ts = new Timestamp(date.getTime());
+                    Intent intent = new Intent(MainActivity.this, NewTagMeCalls.class);
+                    intent.putExtra("callRecords", callRecords);
+                    intent.putExtra("SMSRecords", SMSRecords);
+                    intent.putExtra("freqContacts", freqContacts);
+                    intent.putExtra("nameHash", nameHash);
+                    intent.putExtra("idHash", idHash);
+                    intent.putExtra("maxId", maxId);
+                    intent.putExtra("UserName", name.getText().toString());
+                    intent.putExtra("TimeStamp", ts.toString());
+                    //intent.putExtra("csvName", csvName);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -257,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
                             maxId += 1;
                         }
 
-                        SMSRecordArray.add(hashedNumber + "," + body + "," + dateString + "," + type + "\n" );
+                        SMSRecordArray.add(hashedNumber + "," + body + "," + dateString + "\n" );
                         System.out.println(" Hashed Number = " + hashedNumber + " Number = " + number + " Body = " + body + " Date = " + dateString + " Type = " + type);
                     }
                 }//gives number of records
