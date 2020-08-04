@@ -28,7 +28,7 @@ import java.util.HashMap;
 
 public class NewTagMeSMS extends AppCompatActivity {
     String[] SMSRecords, freqSms;
-    String[] relationshipMap = { "Tag Here", "Friend", "Father", "Mother", "Spouse", "Child", "Sibling", "Colleague", "Other" };
+    String[] relationshipMap = {"Tag Here", "Friend", "Work", "School/College", "Father", "Mother", "Spouse/Partner", "Sister", "Brother", "Daughter", "Son", "Relative", "Other" };
     TextView titleTextView;
     Button nextButton;
     int arrayPointer = 0;
@@ -176,7 +176,7 @@ public class NewTagMeSMS extends AppCompatActivity {
                         if (shouldBeHidden == false)
                             s += nameHash.get(freqSms[i]) + ", " + relationshipSpinner[i].getSelectedItem();
                         else
-                            s += "#####" + ", " + relationshipSpinner[i].getSelectedItem();
+                            s += "null" + ", " + relationshipSpinner[i].getSelectedItem();
                     /*if (rb[i][0].isChecked()) {
                         s += ", Male, " + relationshipSpinner[i].getSelectedItem() + ", " + age[i].getText();
                     } else if (rb[i][1].isChecked()){
