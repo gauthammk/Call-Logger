@@ -159,21 +159,25 @@ public class MainActivity extends AppCompatActivity {
                     String type = managedCursor.getString(2);
                     String date = managedCursor.getString(3);
                     SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.ENGLISH);
-                    String dateString = formatter.format(new Date(Long.parseLong(date)));
+                    String dateStr = formatter.format(new Date(Long.parseLong(date)));
+                    String  dateString = unixTime(dateStr).toString();
                     String duration = managedCursor.getString(4);
                     String dir = null;
                     int dircode = Integer.parseInt(type);
                     switch (dircode) {
                         case OUTGOING_TYPE:
-                            dir = "OUTGOING";
+                            //dir = "OUTGOING";
+                            dir = "2";
                             break;
 
                         case INCOMING_TYPE:
-                            dir = "INCOMING";
+                            //dir = "INCOMING";
+                            dir = "1";
                             break;
 
                         case MISSED_TYPE:
-                            dir = "MISSED";
+                            //dir = "MISSED";
+                            dir = "3";
                             break;
                     }
 
@@ -267,7 +271,8 @@ public class MainActivity extends AppCompatActivity {
                     String date = managedCursor.getString(4);
                     String type = managedCursor.getString(5);
                     SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.ENGLISH);
-                    String dateString = formatter.format(new Date(Long.parseLong(date)));
+                    String dateStr = formatter.format(new Date(Long.parseLong(date)));
+                    String  dateString = unixTime(dateStr).toString();
                     //removing the commas from the SMS body so that it does not interfere with the csv file format
                     body = body.replace(',','.');
                     body = body.replace('\n',' ');
@@ -350,7 +355,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+    public static Long unixTime(String timestamp){
+        if(timestamp == null) return null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.ENGLISH);
+            Date dt = sdf.parse(timestamp);
+            long epoch = dt.getTime();
+            //return (int)(epoch/1000);
+            return epoch;
+        } catch(ParseException e) {
+            return null;
+        }
+    }
     public  String[] countFreq(String arr[], int n)
     {
         Map<String, Integer> mp = new HashMap<>();

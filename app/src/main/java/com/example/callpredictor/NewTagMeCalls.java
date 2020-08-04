@@ -27,7 +27,7 @@ import java.util.HashMap;
 
 public class NewTagMeCalls extends AppCompatActivity {
     String[] callRecords, SMSRecords, freqContacts;
-    String[] relationshipMap = {"Tag Here", "Friend", "Father", "Mother", "Spouse", "Child", "Sibling", "Colleague", "Other" };
+    String[] relationshipMap = {"Tag Here", "Friend", "Work", "School/College", "Father", "Mother", "Spouse/Partner", "Sister", "Brother", "Daughter", "Son", "Relative", "Other" };
     TextView titleTextView;
     Button nextButton;
     int index;
@@ -42,7 +42,7 @@ public class NewTagMeCalls extends AppCompatActivity {
     int maxId;
     MainActivity.DynamicArray finalSmsArray = new MainActivity.DynamicArray();
     MainActivity.DynamicArray freqSms = new MainActivity.DynamicArray();
-    MainActivity.DynamicArray taggedContacts = new MainActivity.DynamicArray();
+
 
    Object[] smsSet ;
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -183,32 +183,43 @@ public class NewTagMeCalls extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
-
+                //MainActivity.DynamicArray taggedContacts = new MainActivity.DynamicArray();
+                MainActivity.DynamicArray taggedContactsnum = new MainActivity.DynamicArray();
                 // Check if the minimum number of records are tagged
-                int taggedContactsnum = 0;
+                int totalContactsTagged = 0;
                 for (int i = 0; i < freqContacts.length; i++) {
                     if (relationshipSpinner[i].getSelectedItem() != "Tag Here") {
-                        taggedContactsnum++;
-                        taggedContacts.add(freqContacts[i]);
+                        taggedContactsnum.add(Integer.toString(i));
+                        totalContactsTagged++;
+                        //taggedContacts.add(freqContacts[i]);
                     }
+                    /*else{
+                        if(taggedContactsnum.array.length < required){
+                            break;
+                        }
+                    }*/
                 }
-                taggedContacts.shrinkSize();
+                if (totalContactsTagged >= required){
+                    taggedContactsnum.shrinkSize();
+                //taggedContacts.shrinkSize();
                 System.out.println("--------------------------------------------------------Tagged Call Record Names---------------------------------------");
-                for(int i=0; i < taggedContacts.array.length; i++){
-                    System.out.println(nameHash.get(taggedContacts.array[i]));
-                    callHash.put(taggedContacts.array[i], null);
+                for (int i = 0; i < taggedContactsnum.array.length; i++) {
+                    int k = Integer.parseInt(taggedContactsnum.array[i]);
+                    System.out.println(nameHash.get(freqContacts[k]));
+                    callHash.put(freqContacts[k], null);
                 }
-                if (taggedContactsnum >= required) {
+                if (taggedContactsnum.array.length >= required) {
                     // Adding the csv headers
                     callRecordsCommaSeparated.append("Id, Name, Relationship, CallType, Date_Time, Duration\n");
                     // creating the string to convert to csv
-                    for (int i = 0; i < taggedContacts.array.length; i++) {
+                    for (int k = 0; k < taggedContactsnum.array.length; k++) {
+                        int i = Integer.parseInt(taggedContactsnum.array[k]);
                         boolean shouldBeHidden = hider[i].isChecked();
                         String s = "";
                         if (shouldBeHidden == false)
-                            s += nameHash.get(taggedContacts.array[i]) + ", " + relationshipSpinner[i].getSelectedItem();
+                            s += nameHash.get(freqContacts[i]) + ", " + relationshipSpinner[i].getSelectedItem();
                         else
-                            s += "#####" + ", " + relationshipSpinner[i].getSelectedItem();
+                            s += "null" + ", " + relationshipSpinner[i].getSelectedItem();
                     /*if (rb[i][0].isChecked()) {
                         s += ", Male, " + relationshipSpinner[i].getSelectedItem() + ", " + age[i].getText();
                     } else if (rb[i][1].isChecked()){
@@ -217,20 +228,21 @@ public class NewTagMeCalls extends AppCompatActivity {
                     else{
                         s += ", , " + relationshipSpinner[i].getSelectedItem() + ", " + age[i].getText();
                     }*/
-                        callHash.replace(taggedContacts.array[i], s);
+                        callHash.replace(freqContacts[i], s);
                     }
                     while (arrayPointer < callRecords.length) {
                         //System.out.println("Array Pointer = "+arrayPointer);
                         //index = callRecords[arrayPointer].indexOf(",")+1;
                         index = 0;
                         hashNum = callRecords[arrayPointer].substring(index, index + 8);
-                        if(callHash.containsKey(hashNum))
+                        if (callHash.containsKey(hashNum))
                             callRecordsCommaSeparated.append(idHash.get(hashNum)).append(", ").append(callHash.get(hashNum)).append(", ").append(callRecords[arrayPointer].substring(9));
                         arrayPointer++;
                     }
-                    for (int i = 0; i < taggedContacts.array.length; i++) {
-                        if (smsHash.containsKey(taggedContacts.array[i])) {
-                            smsHash.replace(taggedContacts.array[i], callHash.get(taggedContacts.array[i]));
+                    for (int i = 0; i < taggedContactsnum.array.length; i++) {
+                        int k = Integer.parseInt(taggedContactsnum.array[i]);
+                        if (smsHash.containsKey(freqContacts[k])) {
+                            smsHash.replace(freqContacts[k], callHash.get(freqContacts[k]));
                         }
                     }
                     smsSet = smsHash.keySet().toArray();
@@ -281,7 +293,13 @@ public class NewTagMeCalls extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }*/
+                } else {
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            "Please tag at least " + required + " contacts",
+                            Toast.LENGTH_SHORT);
+                    toast.show();
                 }
+            }
                 else {
                     Toast toast = Toast.makeText(getApplicationContext(),
                             "Please tag at least " + required + " contacts",
