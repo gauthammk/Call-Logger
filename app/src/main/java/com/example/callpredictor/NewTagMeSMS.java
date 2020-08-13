@@ -1,5 +1,6 @@
 package com.example.callpredictor;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -156,6 +157,7 @@ public class NewTagMeSMS extends AppCompatActivity {
 
         // listening for next button click
         nextButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("NewApi")
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {

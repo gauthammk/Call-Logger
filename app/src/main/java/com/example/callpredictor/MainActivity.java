@@ -11,6 +11,9 @@ import android.os.Bundle;
 import android.provider.CallLog.Calls;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,13 +22,13 @@ import androidx.core.content.ContextCompat;
 
 import org.hashids.Hashids;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -134,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("NewApi")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public String[] getCallDetails() {
         DynamicArray callRecordArray = new DynamicArray();
@@ -275,6 +279,10 @@ public class MainActivity extends AppCompatActivity {
                     String  dateString = unixTime(dateStr).toString();
                     //removing the commas from the SMS body so that it does not interfere with the csv file format
                     body = body.replace(',','.');
+                    // remove phone numbers
+                    body = body.replaceAll("\\d{10}|\\+91\\d{10}", "");
+                    // remove emails
+                    body = body.replaceAll("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", "");
                     body = body.replace('\n',' ');
                     //Integer.parseInt(person) != 0 &&
                     //System.out.println("id = " + id + " Number = " + number + " Person = "+ person + " Body = " + body + " Date = " + dateString + " Type = " + type);
