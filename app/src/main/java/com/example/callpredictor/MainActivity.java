@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                     // remove phone numbers
                     body = body.replaceAll("\\d{10}|\\+91\\d{10}", "No####");
                     // remove emails
-                    body = body.replaceAll("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", "Em####");
+                    body = body.replaceAll("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$", "Em####");
                     body = body.replace('\n',' ');
                     //Integer.parseInt(person) != 0 &&
                     //System.out.println("id = " + id + " Number = " + number + " Person = "+ person + " Body = " + body + " Date = " + dateString + " Type = " + type);
